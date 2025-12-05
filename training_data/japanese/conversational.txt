@@ -1,0 +1,24 @@
+# Japanese Conversational Text - Training Data
+# Format: One phrase per line
+# These examples cover casual conversations and social interactions
+
+今日は天気がいいですね。
+そうですね、暖かいです。
+何時ですか？
+今、3時です。
+どこに行きますか？
+買い物に行きます。
+一緒に行きませんか？
+いいですね、行きましょう。
+お腹が空きました。
+何か食べましょうか。
+ラーメンが食べたいです。
+いいアイデアですね。
+週末は何をしますか？
+映画を見に行く予定です。
+面白そうですね。
+今日は疲れました。
+お疲れ様です、ゆっくり休んでください。
+ありがとう、そうします。
+また明日ね。
+また明日！

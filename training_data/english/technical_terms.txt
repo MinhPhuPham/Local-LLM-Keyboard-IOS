@@ -1,0 +1,24 @@
+# English Technical Terms - Training Data
+# Format: One phrase per line
+# These examples cover programming, software development, and technical communication
+
+Initialize the database connection.
+Run the test suite to verify changes.
+Deploy the application to production.
+The build failed due to a syntax error.
+Merge the pull request after review.
+Create a new branch for this feature.
+Update the dependencies to the latest version.
+Fix the bug in the authentication module.
+Optimize the query performance.
+Implement the new API endpoint.
+Refactor the code for better readability.
+Add unit tests for the new function.
+Configure the environment variables.
+Debug the memory leak issue.
+Push the changes to the remote repository.
+Review the code before committing.
+Set up the development environment.
+Install the required packages.
+The server is running on port 3000.
+Check the logs for error messages.

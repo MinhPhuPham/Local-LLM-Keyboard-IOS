@@ -1,0 +1,24 @@
+# English Conversational Text - Training Data
+# Format: One phrase per line
+# These examples cover casual conversations and social interactions
+
+What time is it?
+Where are you going?
+I'm heading to the store.
+Do you want to grab lunch?
+Sure, what time works for you?
+How about noon?
+That sounds perfect!
+I'll meet you there.
+Did you see the game last night?
+Yeah, it was incredible!
+I can't believe they won.
+The weather is nice today.
+It's a bit chilly though.
+Don't forget your jacket.
+I'm running a bit late.
+No worries, take your time.
+Are you free this weekend?
+I think so, what did you have in mind?
+Maybe we could catch a movie?
+That would be fun!
