@@ -51,30 +51,26 @@ class ModelCompressor:
     
     def step1_quantization(self, model) -> torch.nn.Module:
         """
-        Apply 4-bit quantization to the model.
+        Apply model compression (half-precision instead of quantization for macOS).
         
-        Note: For production, use bitsandbytes library for proper 4-bit quantization.
-        This is a simplified version using PyTorch's built-in quantization.
+        Note: PyTorch quantization doesn't work on macOS/MPS.
+        Using half-precision (float16) instead for cross-platform compatibility.
         """
-        print("\n1️⃣  Applying quantization...")
+        print("\n1️⃣  Applying half-precision conversion...")
         original_size = self.get_model_size(model)
         
-        # Convert to quantized model (dynamic quantization)
-        # For iOS, we'll use static quantization in production
-        quantized_model = torch.quantization.quantize_dynamic(
-            model,
-            {torch.nn.Linear},
-            dtype=torch.qint8  # 8-bit for now (4-bit requires bitsandbytes)
-        )
+        # Convert to half precision (float16)
+        # This works on all platforms including macOS
+        model = model.half()
         
-        quantized_size = self.get_model_size(quantized_model)
-        reduction = (1 - quantized_size / original_size) * 100
+        compressed_size = self.get_model_size(model)
+        reduction = (1 - compressed_size / original_size) * 100
         
         print(f"   Original: {original_size:.2f} MB")
-        print(f"   Quantized: {quantized_size:.2f} MB")
+        print(f"   Half-precision: {compressed_size:.2f} MB")
         print(f"   Reduction: {reduction:.1f}%")
         
-        return quantized_model
+        return model
     
     def step2_pruning(self, model, amount: float = 0.3) -> torch.nn.Module:
         """
@@ -172,7 +168,7 @@ class ModelCompressor:
         initial_size = self.get_model_size(model)
         print(f"Initial model size: {initial_size:.2f} MB")
         
-        # Step 1: Quantization
+        # Step 1: Half-precision (works on macOS)
         model = self.step1_quantization(model)
         
         # Step 2: Pruning

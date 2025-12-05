@@ -67,6 +67,8 @@ Compressed models saved to: `models/*/compressed/`
 
 **"Module not found"**: Activate venv first: `source venv/bin/activate`
 
+**"accelerate not found"**: Install it: `pip install 'accelerate>=0.26.0'`
+
 **"Out of memory"**: Reduce batch_size in `train_model.py` (line 76)
 
 **"Model too large"**: Current 80 examples create small models. Add more data for production.
