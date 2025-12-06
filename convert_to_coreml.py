@@ -49,15 +49,27 @@ def convert_to_coreml(language: str):
     example_input = torch.randint(0, vocab_size, (batch_size, seq_length))
     
     print("\nConverting to CoreML...")
-    print("⚠️  Note: This creates a basic CoreML model.")
-    print("   For production, you may need custom conversion with:")
-    print("   - Optimized input/output shapes")
-    print("   - Compute unit specification (Neural Engine)")
-    print("   - Model encryption")
+    print("⚠️  Note: Creating CoreML model for iOS 15+")
     
     try:
-        # Trace the model
-        traced_model = torch.jit.trace(model, example_input)
+        # Create a wrapper that returns only logits (not dict)
+        class CoreMLWrapper(torch.nn.Module):
+            def __init__(self, model):
+                super().__init__()
+                self.model = model
+            
+            def forward(self, input_ids):
+                # Only return logits, not the dict
+                outputs = self.model(input_ids)
+                return outputs['logits']
+        
+        # Wrap the model
+        wrapped_model = CoreMLWrapper(model)
+        wrapped_model.eval()
+        
+        # Trace the wrapped model (strict=False to allow dict in original model)
+        with torch.no_grad():
+            traced_model = torch.jit.trace(wrapped_model, example_input, strict=False)
         
         # Convert to CoreML
         output_dir = Path(f"models/{language}/coreml")
@@ -75,6 +87,7 @@ def convert_to_coreml(language: str):
         mlmodel.save(str(model_file))
         
         print(f"\n✅ CoreML model saved to: {model_file}")
+        print(f"   Model size: {sum(f.stat().st_size for f in output_dir.rglob('*') if f.is_file()) / 1024 / 1024:.2f} MB")
         
         # Save metadata
         metadata = {
@@ -96,12 +109,15 @@ def convert_to_coreml(language: str):
         print(f"Ready for Xcode integration!")
         
     except Exception as e:
-        print(f"\n⚠️  CoreML conversion encountered an issue:")
+        print(f"\n❌ CoreML conversion failed:")
         print(f"   {str(e)}")
-        print(f"\nThe model is still usable. For production:")
-        print(f"1. Use the PyTorch model directly")
-        print(f"2. Or implement custom CoreML conversion")
-        print(f"3. Model files are in: {model_path}")
+        print(f"\nTroubleshooting:")
+        print(f"1. Check coremltools version: pip install --upgrade coremltools")
+        print(f"2. Model files are still usable in: {model_path}")
+        print(f"3. You can use PyTorch Mobile as alternative")
+        return False
+    
+    return True
 
 
 def main():

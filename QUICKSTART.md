@@ -59,11 +59,33 @@ Final size: **~3MB per model** (perfect for iOS!)
 
 ## 5. iOS Integration
 
+### What to Copy to Xcode
+
+Copy these files to your Xcode project:
+
+```
+models/english/ios_ready/model.safetensors  (3.0 MB)
+models/japanese/ios_ready/model.safetensors (3.0 MB)
+ios_components/                              (Swift files)
+```
+
+### Quick Steps
+
 1. Open `custom-keyboard-ios.xcodeproj` in Xcode
-2. Drag `ios_components/` folder into project
-3. Add App Group capability: `group.com.keyboard.llm`
-4. Copy compressed models to project bundle
-5. Build and run on device (iOS 15+)
+2. Drag model files into keyboard extension target
+3. Drag `ios_components/` folder into project
+4. Add App Group capability: `group.com.keyboard.llm`
+5. Implement keyboard UI in `KeyboardViewController.swift`
+
+**See [XCODE_INTEGRATION.md](XCODE_INTEGRATION.md) for detailed guide**
+
+### Note About CoreML
+
+CoreML conversion doesn't work with our custom transformer architecture. Instead, use:
+- **Option A**: PyTorch Mobile (add via CocoaPods)
+- **Option B**: Lookup table (no ML framework needed - faster!)
+
+See XCODE_INTEGRATION.md for both approaches.
 
 ## Common Issues
 
