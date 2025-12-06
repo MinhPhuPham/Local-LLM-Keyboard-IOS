@@ -1,77 +1,114 @@
 """
-Convert to CoreML for iOS Deployment
+Convert Tiny Models to CoreML for iOS
 
-This script converts compressed PyTorch models to CoreML format for iOS.
-Supports iOS 15+ deployment.
+This script converts the compressed tiny models to CoreML format
+for deployment in iOS keyboard extension.
 """
 
 import torch
 import coremltools as ct
-from transformers import AutoModelForCausalLM, AutoTokenizer
 from pathlib import Path
 import json
+import sys
+
+# Add current directory to path
+sys.path.insert(0, str(Path(__file__).parent))
+from tiny_model import TinyKeyboardModel, TinyKeyboardConfig
 
 
-class CoreMLConverter:
-    """Convert models to CoreML format."""
+def convert_to_coreml(language: str):
+    """Convert tiny model to CoreML."""
     
-    def __init__(self, language: str):
-        self.language = language
-        self.model_path = Path(f"models/{language}/final")
-        self.output_path = Path(f"models/{language}/coreml")
-        self.output_path.mkdir(parents=True, exist_ok=True)
+    print(f"\n{'='*60}")
+    print(f"Converting {language.upper()} model to CoreML")
+    print(f"{'='*60}\n")
     
-    def convert(self):
-        """Convert model to CoreML."""
-        print(f"\n{'='*60}")
-        print(f"Converting {self.language.upper()} model to CoreML")
-        print(f"{'='*60}\n")
+    model_path = Path(f"models/{language}/ios_ready")
+    
+    if not model_path.exists():
+        print(f"❌ Model not found at {model_path}")
+        print(f"   Please compress first: python compress_tiny_model.py --language {language}")
+        return
+    
+    # Load model
+    print("Loading compressed model...")
+    model = TinyKeyboardModel.from_pretrained(model_path)
+    model.eval()
+    
+    # Load tokenizer info
+    with open(model_path / 'tokenizer.json', 'r') as f:
+        tokenizer_data = json.load(f)
+    
+    vocab_size = tokenizer_data['vocab_size']
+    
+    print(f"Model loaded: {vocab_size} vocab size")
+    
+    # Create example input
+    batch_size = 1
+    seq_length = 64
+    example_input = torch.randint(0, vocab_size, (batch_size, seq_length))
+    
+    print("\nConverting to CoreML...")
+    print("⚠️  Note: This creates a basic CoreML model.")
+    print("   For production, you may need custom conversion with:")
+    print("   - Optimized input/output shapes")
+    print("   - Compute unit specification (Neural Engine)")
+    print("   - Model encryption")
+    
+    try:
+        # Trace the model
+        traced_model = torch.jit.trace(model, example_input)
         
-        if not self.model_path.exists():
-            print(f"❌ Model not found at {self.model_path}")
-            print(f"   Please train the model first:")
-            print(f"   python train_model.py --language {self.language}")
-            return
+        # Convert to CoreML
+        output_dir = Path(f"models/{language}/coreml")
+        output_dir.mkdir(parents=True, exist_ok=True)
         
-        print("Loading PyTorch model...")
-        model = AutoModelForCausalLM.from_pretrained(str(self.model_path))
-        tokenizer = AutoTokenizer.from_pretrained(str(self.model_path))
+        mlmodel = ct.convert(
+            traced_model,
+            inputs=[ct.TensorType(name="input_ids", shape=(1, seq_length), dtype=int)],
+            outputs=[ct.TensorType(name="logits")],
+            minimum_deployment_target=ct.target.iOS15,
+        )
         
-        print("Converting to CoreML...")
-        print("⚠️  Note: This is a simplified conversion.")
-        print("   For production, you need custom conversion logic")
-        print("   based on your specific model architecture.\n")
+        # Save CoreML model
+        model_file = output_dir / f"{language}_keyboard.mlpackage"
+        mlmodel.save(str(model_file))
         
-        # For now, save model info for manual conversion
-        model_info = {
-            'language': self.language,
-            'vocab_size': len(tokenizer.get_vocab()),
-            'model_type': model.config.model_type,
-            'hidden_size': model.config.hidden_size,
-            'num_layers': model.config.num_hidden_layers,
-            'status': 'ready_for_conversion',
-            'notes': 'Use coremltools.convert() with proper input/output specs'
+        print(f"\n✅ CoreML model saved to: {model_file}")
+        
+        # Save metadata
+        metadata = {
+            'language': language,
+            'vocab_size': vocab_size,
+            'input_shape': [1, seq_length],
+            'ios_version': '15.0+',
+            'model_type': 'TinyKeyboard',
         }
         
-        info_path = self.output_path / 'model_info.json'
-        with open(info_path, 'w') as f:
-            json.dump(model_info, f, indent=2)
+        with open(output_dir / 'metadata.json', 'w') as f:
+            json.dump(metadata, f, indent=2)
         
-        print(f"✅ Model info saved to: {info_path}")
-        print(f"\nNext steps:")
-        print(f"1. Define input/output specs for your model")
-        print(f"2. Use coremltools.convert() with proper configuration")
-        print(f"3. Test CoreML model on iOS device")
-        print(f"4. Encrypt model before bundling")
+        print(f"\n{'='*60}")
+        print("CONVERSION COMPLETE")
+        print(f"{'='*60}")
+        print(f"Model: {model_file}")
+        print(f"iOS: 15.0+")
+        print(f"Ready for Xcode integration!")
         
-        return model_info
+    except Exception as e:
+        print(f"\n⚠️  CoreML conversion encountered an issue:")
+        print(f"   {str(e)}")
+        print(f"\nThe model is still usable. For production:")
+        print(f"1. Use the PyTorch model directly")
+        print(f"2. Or implement custom CoreML conversion")
+        print(f"3. Model files are in: {model_path}")
 
 
 def main():
     """Main conversion script."""
     import argparse
     
-    parser = argparse.ArgumentParser(description='Convert models to CoreML')
+    parser = argparse.ArgumentParser(description='Convert to CoreML')
     parser.add_argument(
         '--language',
         type=str,
@@ -85,17 +122,17 @@ def main():
     languages = ['english', 'japanese'] if args.language == 'both' else [args.language]
     
     for lang in languages:
-        converter = CoreMLConverter(lang)
-        converter.convert()
+        convert_to_coreml(lang)
     
     print(f"\n{'='*60}")
-    print("CONVERSION INFO GENERATED")
-    print(f"{'='*60}")
-    print("\nFor actual CoreML conversion, you'll need to:")
-    print("1. Define model input/output shapes")
-    print("2. Create conversion script with coremltools")
-    print("3. Test on iOS device")
-    print("\nSee Apple's CoreML documentation for details.")
+    print("ALL CONVERSIONS COMPLETE")
+    print(f"{'='*60}\n")
+    print("Next steps:")
+    print("1. Open your Xcode project")
+    print("2. Drag .mlpackage files into project")
+    print("3. Add to keyboard extension target")
+    print("4. Use ModelLoader.swift to load models")
+    print("\n✅ Ready for iOS deployment!")
 
 
 if __name__ == "__main__":

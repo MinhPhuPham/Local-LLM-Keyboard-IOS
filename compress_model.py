@@ -241,13 +241,18 @@ def main():
     results = {}
     
     for lang in languages:
-        model_path = f"models/{lang}/final"
+        # Try tiny_final first, then fall back to final
+        model_path = f"models/{lang}/tiny_final"
+        if not Path(model_path).exists():
+            model_path = f"models/{lang}/final"
         
         if not Path(model_path).exists():
             print(f"\n⚠️  Warning: Model not found at {model_path}")
-            print(f"   Please train the {lang} model first: python train_model.py --language {lang}")
+            print(f"   Please train the {lang} model first:")
+            print(f"   python train_tiny_model.py --language {lang}")
             continue
         
+        print(f"\nUsing model from: {model_path}")
         compressor = ModelCompressor(model_path, lang)
         compressed_model, compressed_vocab, metadata = compressor.compress()
         results[lang] = metadata

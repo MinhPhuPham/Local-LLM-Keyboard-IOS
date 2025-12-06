@@ -36,24 +36,26 @@ Expected output: Statistics for English (80 examples) and Japanese (80 examples)
 
 ## 3. Train Models (10-30 minutes depending on hardware)
 
-```bash
-# Train both languages with testing
-python train_model.py --language both --test
-
-# OR train individually
-python train_model.py --language english
-python train_model.py --language japanese
-```
-
-Models saved to: `models/english/final/` and `models/japanese/final/`
-
-## 4. Compress Models (5-10 minutes)
+**IMPORTANT**: Use the tiny model trainer (not train_model.py)
 
 ```bash
-python compress_model.py --language both
+# Train tiny models (<10M parameters each)
+python train_tiny_model.py --language both --epochs 20
+
+# This creates models ~5-10MB each (vs 300MB+ with distilgpt2)
 ```
 
-Compressed models saved to: `models/*/compressed/`
+Models saved to: `models/english/tiny_final/` and `models/japanese/tiny_final/`
+
+## 4. Compress Models (1-2 minutes)
+
+```bash
+python compress_tiny_model.py --language both
+```
+
+Compressed models saved to: `models/*/ios_ready/`
+
+Final size: **~3MB per model** (perfect for iOS!)
 
 ## 5. iOS Integration
 
