@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4BDEFFBB2EE9151800409E6E /* KeyboardAI.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 4BDEFFBA2EE9151800409E6E /* KeyboardAI.mlpackage */; };
+		4BDEFFBD2EE9154800409E6E /* KeyboardAIModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDEFFBC2EE9154700409E6E /* KeyboardAIModel.swift */; };
+		4BDEFFBF2EE9155300409E6E /* Tokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDEFFBE2EE9155300409E6E /* Tokenizer.swift */; };
+		4BDEFFC32EE9194E00409E6E /* model_info.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BDEFFC02EE9194E00409E6E /* model_info.json */; };
+		4BDEFFC42EE9194E00409E6E /* tokenizer.model in Resources */ = {isa = PBXBuildFile; fileRef = 4BDEFFC12EE9194E00409E6E /* tokenizer.model */; };
+		4BDEFFC52EE9194E00409E6E /* tokenizer.vocab in Resources */ = {isa = PBXBuildFile; fileRef = 4BDEFFC22EE9194E00409E6E /* tokenizer.vocab */; };
 		8FEADEA72C6ED27B006E1206 /* custom_keyboard_iosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FEADEA62C6ED27B006E1206 /* custom_keyboard_iosApp.swift */; };
 		8FEADEA92C6ED27B006E1206 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FEADEA82C6ED27B006E1206 /* ContentView.swift */; };
 		8FEADEAB2C6ED27C006E1206 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8FEADEAA2C6ED27C006E1206 /* Assets.xcassets */; };
@@ -62,6 +68,12 @@
 		0E6790E3418A5D7F6CE3EB4B /* Pods-Custom Keyboard.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Custom Keyboard.debug.xcconfig"; path = "Target Support Files/Pods-Custom Keyboard/Pods-Custom Keyboard.debug.xcconfig"; sourceTree = "<group>"; };
 		144FDF49702B92AEF4D19C3D /* Pods-custom-keyboard-ios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-custom-keyboard-ios.debug.xcconfig"; path = "Target Support Files/Pods-custom-keyboard-ios/Pods-custom-keyboard-ios.debug.xcconfig"; sourceTree = "<group>"; };
 		38481F1E0D397550DB469A5E /* Pods-custom-keyboard-ios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-custom-keyboard-ios.release.xcconfig"; path = "Target Support Files/Pods-custom-keyboard-ios/Pods-custom-keyboard-ios.release.xcconfig"; sourceTree = "<group>"; };
+		4BDEFFBA2EE9151800409E6E /* KeyboardAI.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = KeyboardAI.mlpackage; sourceTree = "<group>"; };
+		4BDEFFBC2EE9154700409E6E /* KeyboardAIModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardAIModel.swift; sourceTree = "<group>"; };
+		4BDEFFBE2EE9155300409E6E /* Tokenizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokenizer.swift; sourceTree = "<group>"; };
+		4BDEFFC02EE9194E00409E6E /* model_info.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = model_info.json; sourceTree = "<group>"; };
+		4BDEFFC12EE9194E00409E6E /* tokenizer.model */ = {isa = PBXFileReference; lastKnownFileType = file; path = tokenizer.model; sourceTree = "<group>"; };
+		4BDEFFC22EE9194E00409E6E /* tokenizer.vocab */ = {isa = PBXFileReference; lastKnownFileType = text; path = tokenizer.vocab; sourceTree = "<group>"; };
 		8FEADEA32C6ED27B006E1206 /* custom-keyboard-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "custom-keyboard-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FEADEA62C6ED27B006E1206 /* custom_keyboard_iosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = custom_keyboard_iosApp.swift; sourceTree = "<group>"; };
 		8FEADEA82C6ED27B006E1206 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -177,8 +189,14 @@
 		8FEADED62C6ED37F006E1206 /* Custom Keyboard */ = {
 			isa = PBXGroup;
 			children = (
+				4BDEFFC02EE9194E00409E6E /* model_info.json */,
+				4BDEFFC12EE9194E00409E6E /* tokenizer.model */,
+				4BDEFFC22EE9194E00409E6E /* tokenizer.vocab */,
+				4BDEFFBC2EE9154700409E6E /* KeyboardAIModel.swift */,
+				4BDEFFBE2EE9155300409E6E /* Tokenizer.swift */,
 				8FEADED72C6ED37F006E1206 /* KeyboardViewController.swift */,
 				8FEADED92C6ED37F006E1206 /* Info.plist */,
+				4BDEFFBA2EE9151800409E6E /* KeyboardAI.mlpackage */,
 			);
 			path = "Custom Keyboard";
 			sourceTree = "<group>";
@@ -356,6 +374,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BDEFFC32EE9194E00409E6E /* model_info.json in Resources */,
+				4BDEFFC42EE9194E00409E6E /* tokenizer.model in Resources */,
+				4BDEFFC52EE9194E00409E6E /* tokenizer.vocab in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -439,6 +460,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BDEFFBD2EE9154800409E6E /* KeyboardAIModel.swift in Sources */,
+				4BDEFFBF2EE9155300409E6E /* Tokenizer.swift in Sources */,
+				4BDEFFBB2EE9151800409E6E /* KeyboardAI.mlpackage in Sources */,
 				8FEADED82C6ED37F006E1206 /* KeyboardViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

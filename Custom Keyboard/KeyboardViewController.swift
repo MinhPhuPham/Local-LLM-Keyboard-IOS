@@ -37,9 +37,24 @@ class KeyboardViewController: UIInputViewController {
     var placeholders: [UIView] = []
     var thumbnailView: UIScrollView!
     
+    private var model: KeyboardAIModel?
+    private var suggestionBar: UIStackView!
+    private var predictionCache: [String: [String]] = [:]
+    
     // MARK: View Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        // Load model (lazy loading for better performance)
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            self?.model = KeyboardAIModel()
+            if self?.model == nil {
+                print("Failed to initialize model")
+            }
+        }
+        
+        // Setup UI
+        setupSuggestionBar()
+        
         setupLetterButtons()
         setupCustomView()
         isShiftEnabled = true  // Start with the shift key enabled
@@ -565,5 +580,87 @@ class KeyboardViewController: UIInputViewController {
         } else {
             updateForGalleryView()
         }
+    }
+}
+
+extension KeyboardViewController {
+    private func setupSuggestionBar() {
+        suggestionBar = UIStackView()
+        suggestionBar.axis = .horizontal
+        suggestionBar.distribution = .fillEqually
+        suggestionBar.spacing = 4
+        suggestionBar.backgroundColor = .systemGray6
+        
+        view.addSubview(suggestionBar)
+        
+        suggestionBar.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            suggestionBar.topAnchor.constraint(equalTo: view.topAnchor),
+            suggestionBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            suggestionBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            suggestionBar.heightAnchor.constraint(equalToConstant: 40)
+        ])
+    }
+    
+    override func textDidChange(_ textInput: UITextInput?) {
+        guard let proxy = textDocumentProxy as UITextDocumentProxy?,
+              let text = proxy.documentContextBeforeInput,
+              !text.isEmpty else {
+            clearSuggestions()
+            return
+        }
+        
+        updateSuggestions(for: text)
+    }
+    
+    private func updateSuggestions(for text: String) {
+        // Check cache first
+        if let cached = predictionCache[text] {
+            displaySuggestions(cached)
+            return
+        }
+        
+        guard let model = model else { return }
+        
+        // Get predictions in background
+        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+            let suggestions = model.predict(text: text, topK: 3)
+            
+            // Cache result
+            self?.predictionCache[text] = suggestions
+            
+            // Limit cache size
+            if self?.predictionCache.count ?? 0 > 100 {
+                self?.predictionCache.removeAll()
+            }
+            
+            DispatchQueue.main.async {
+                print("\(#function) suggestions: \(suggestions)")
+                self?.displaySuggestions(suggestions)
+            }
+        }
+    }
+    
+    private func displaySuggestions(_ suggestions: [String]) {
+        // Clear existing
+        suggestionBar.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        // Add new suggestions
+        for suggestion in suggestions {
+            let button = UIButton(type: .system)
+            button.setTitle(suggestion, for: .normal)
+            button.titleLabel?.font = .systemFont(ofSize: 16)
+            button.addTarget(self, action: #selector(suggestionTapped(_:)), for: .touchUpInside)
+            suggestionBar.addArrangedSubview(button)
+        }
+    }
+    
+    private func clearSuggestions() {
+        suggestionBar.arrangedSubviews.forEach { $0.removeFromSuperview() }
+    }
+    
+    @objc private func suggestionTapped(_ sender: UIButton) {
+        guard let suggestion = sender.title(for: .normal) else { return }
+        textDocumentProxy.insertText(suggestion + " ")
     }
 }
